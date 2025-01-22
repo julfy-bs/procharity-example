@@ -1,50 +1,102 @@
-# React + TypeScript + Vite
+# Пример реализации репозитория Procharity
+ На основе шаблона требуется выполнить разработку небольшого приложения, в котором вы отработаете: 
+ * реализацию вариантов у компонента;
+ *  проброс контекста для разрешения зависимостей окружения;
+ *  распределение ответственности по уровням иерархии.
+ 
+ Приложение должно иметь в составе следующие компоненты:
+ 
+ ```
+ # Pages:
+ 
+ MainPage:
+ — Layout
+ —— Section
+ ——— Button#login -> Modal(LoginForm)
+ ——— Button#register -> Modal(RegisterForm)
+ 
+ LoginPage:
+ — Layout
+ —— Section
+ ——— Card -> LoginForm
+ 
+ RegisterPage:
+ — Layout
+ —— Section
+ ——— Card > RegisterForm
+ 
+ -----------------------
+ # Screens:
+ 
+ LoginForm:
+ — Form
+ —— Field > InputEmail
+ —— Field > InputPassword
+ 
+ RegisterForm:
+ — Form
+ —— Field > InputText
+ —— Field > InputEmail
+ —— Field > InputPassword
+ —— Field > InputPassword
+ 
+ -----------------------
+ # Containers
+ 
+ Layout:
+ — Header
+ — {children}
+ — Footer
+ 
+ Section:
+ — {children}
+ 
+ Card:
+ — {children}
+ 
+ Header:
+ — Logo
+ — Menu
+ — {children}
+ 
+ Footer:
+ — Logo
+ — Menu[]
+ 
+ Form:
+ — {children}
+ 
+ Field:
+ — {children}
+ 
+ Modal:
+ — {children}
+ 
+ ------------------------
+ # Components
+ 
+ — Anchor
+ — Typography {Title, Text}
+ — Input {InputText, InputEmail, InputPassword}
+ — Action {Button, Link}
+ ```
+ 
+ Комментарии к деталям реализации компонент: 
+ * `Typography` компонент используют внутри хук `useTranslation` и выводят текст из языковых файлов по идентификатору переданному в пропсе `value`;
+ * `Form` и `Anchor` используют собственный контекст, через который можно выбрать тег реализующий их, это позволит в сторибуке выводить просто `form` и `a`, но в окружении роутера заменить на `Fetcher` и `Link`;
+ * Компоненты с вариантами (в скобках {варианты через запятую}) сделать через `HOC`;
+ * `Menu` использует `Anchor` для вывода ссылок;
+ * `Logo` по примеру иконок рекомендую вынести в компонент, чтобы поддерживать вариативность в будущем;
+ * Компоненты в разделе `Pages` разделите на Роут и Экран, посмотрите в шаблоне `.templates/page`. А используемые в лоадерах и экшенах каждого роута апи вынесети в отдельные функции в `/src/api/`;
+ * Обратите внимание что корневой маршрут без пути в `App.jsx` это коннектор лейата, у него тоже есть лоадер получающий пользователя, если его нет тогда показывает кнопки регистрация и авторизация;
+ * Стили и размеры можно подсмотреть в макете ProCharity, но не увлекайтесь, это задание именно на правильную композицию, а не верстку. Постарайтесь подумать над каждым компонентом и сделать их максимально простыми и эффективными.
+ 
+ # Как выполнять задание
+ 1. Создайте из шаблона публичный репозиторий в своем GitHub и ведите разработку в ветке develop;
+ 2. Первым коммитом занесите базовые стили и переменные;
+ 3. Вторым коммитом сгенерируйте структуру и продумайте типы;
+ 4. Последующими коммитами реализуйте компонент за компонентом. Но, попробуйте делать с первого раза и не изменять компонент после коммита (за исключением именно ошибок, не меняйте дизайн компонента). Нужно учиться работать с принятыми решениями. Все пожелания по исправлению первой итерации выпишите в `README.md`;
+ 5. Когда готовы компоненты аналогично отдельными коммитами реализуйте сборку страниц, в один коммит можно включить страницу и ее апи. Из апи функции просто через `Promise.resolve` возвращаем моковые данные;
+ 6. Посмотрите на свой код, подумайте что можно было бы улучшить и впишите в `README.md`;
+ 7. Добавьте ссылку на PR в своем репозитории в комментарий к этой задаче. Вам нужно будет выдать доступы тимлиду или наставнику кто придет проверять вашу работу.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-	languageOptions: {
-		// other options...
-		parserOptions: {
-			project: ['./tsconfig.node.json', './tsconfig.app.json'],
-			tsconfigRootDir: import.meta.dirname,
-		},
-	},
-});
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react';
-
-export default tseslint.config({
-	// Set the react version
-	settings: { react: { version: '18.3' } },
-	plugins: {
-		// Add the react plugin
-		react,
-	},
-	rules: {
-		// other rules...
-		// Enable its recommended rules
-		...react.configs.recommended.rules,
-		...react.configs['jsx-runtime'].rules,
-	},
-});
-```
